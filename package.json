@@ -1,0 +1,25 @@
+{
+    "name": "crawler",
+    "productName": "Datareal Crawler",
+    "version": "0.0.1",
+    "author": {
+        "name": "Datareal"
+    },
+    "license": "MIT",
+    "description": "Crawler for real estate websites",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/datareal/crawler.git"
+    },
+    "scripts": {
+        "deploy": "yarn run _private:deploy",
+        "_private:deploy": "serverless deploy --verbose"
+    },
+    "dependencies": {
+        "serverless": "^2.28.0"
+    },
+    "devDependencies": {
+        "serverless-prune-plugin": "^1.4.3",
+        "serverless-python-requirements": "^5.1.0"
+    }
+}

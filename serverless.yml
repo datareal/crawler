@@ -1,0 +1,61 @@
+service: datareal-new-crawler
+frameworkVersion: ^2.25
+
+plugins:
+  - serverless-prune-plugin
+  - serverless-python-requirements
+
+useDotenv: true
+
+provider:
+  name: aws
+  runtime: python3.8
+  lambdaHashingVersion: 20201221
+  stage: dev
+  environment:
+    REAL_ESTATE_TABLE: ${self:custom.RealEstatesTableName}
+    ERROR_PROCESSOR_FUNCTION: ${self:custom.ErrorProcessorFunctionArn}
+  iam:
+    role:
+      statements:
+        - Effect: Allow
+          Action:
+            - lambda:invokeFunction
+          Resource:
+            - ${self:custom.ErrorProcessorFunctionArn}
+        - Effect: Allow
+          Action:
+            - dynamodb:Scan
+          Resource:
+            - ${self:custom.RealEstatesTableArn}
+        - Effect: Allow
+          Action:
+            - dynamodb:Query
+          Resource:
+              - ${self:custom.RealEstatesTableArn}/index/*
+
+package:
+  exclude:
+    - ./node_modules
+    - ./**/__pycache__
+
+functions:
+  ErrorProcessor:
+    handler: src/core/lambda/error.handler
+  Initializer:
+    handler: src/core/lambda/initializer.handler
+    events:
+      - httpApi:
+          path: /initialize
+          method: post
+
+custom:
+  prune:
+    automatic: true
+    number: 3
+  pythonRequirements:
+    dockerizePip: false
+    slim: true
+  RealEstatesTableName: "datareal-crawler-real-estates"
+  RealEstatesTableArn: "arn:aws:dynamodb:${env:AWS_REGION}:${env:AWS_ACCOUNTID}:table/${self:custom.RealEstatesTableName}"
+  ErrorProcessorFunctionArn: "arn:aws:lambda:${env:AWS_REGION}:${env:AWS_ACCOUNTID}:function/datareal-new-crawler-dev-ErrorProcessor"

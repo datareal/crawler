@@ -1,0 +1,2 @@
+class NoURLProvided(Exception):
+    pass
