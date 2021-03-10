@@ -12,10 +12,10 @@ def invoke(function: str, payload: dict) -> None:
     Return:
         Invoke a Lambda function sending the payload to it.
     """    
-    lambda_client = boto3.resource('lambda')
+    lambda_client = boto3.client('lambda')
 
     lambda_client.invoke(
-        FunctionName=os.environ.get(funciton),
+        FunctionName=os.environ.get(function),
         InvocationType='Event',
         Payload=json.dumps(payload)
     )
