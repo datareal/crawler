@@ -1,5 +1,6 @@
 import json
 
+import src.modules.aws as aws
 import src.modules.url as URL
 import src.modules.crawl as crawl
 import src.modules.header as Header
@@ -39,6 +40,9 @@ def handler(event: dict, context) -> dict:
             "NextPage": next_page
         }
     })
+
+    aws.invoke('VERIFIER_FUNCTION', {'urls': items})
+    aws.invoke('DAEMON', {'target': 'DAEMON', 'payload': {'url': next_page}})
 
     return {
         "status_code": 200,

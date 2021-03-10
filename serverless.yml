@@ -15,8 +15,10 @@ provider:
   environment:
     REAL_ESTATE_TABLE: ${self:custom.RealEstatesTableName}
     SEARCH_CONFIG_TABLE: ${self:custom.SearchConfigTableName}
+    DAEMON: ${self:custom.DaemonArn}
     ERROR_PROCESSOR_FUNCTION: ${self:custom.ErrorProcessorFunctionArn}
     SEARCH_FUNCTION: ${self:custom.SearchFunctionArn}
+    VERIFIER_FUNCTION: ${self:custom.VerifierFunctionArn}
   iam:
     role:
       statements:
@@ -24,8 +26,10 @@ provider:
           Action:
             - lambda:invokeFunction
           Resource:
+            - ${self:custom.DaemonArn}
             - ${self:custom.ErrorProcessorFunctionArn}
             - ${self:custom.SearchFunctionArn}
+            - ${self:custom.VerifierFunctionArn}
         - Effect: Allow
           Action:
             - dynamodb:Scan
@@ -44,6 +48,8 @@ package:
     - ./**/__pycache__
 
 functions:
+  Daemon:
+    handler: src/core/daemon/daemon.handler
   ErrorProcessor:
     handler: src/core/lambda/error.handler
   Initializer:
@@ -54,6 +60,8 @@ functions:
           method: post
   Search:
     handler: src/core/lambda/search.handler
+  Verifier:
+    handler: src/core/lambda/verifier.handler
 
 custom:
   prune:
@@ -66,5 +74,7 @@ custom:
   RealEstatesTableArn: "arn:aws:dynamodb:${env:AWS_REGION}:${env:AWS_ACCOUNTID}:table/${self:custom.RealEstatesTableName}"
   SearchConfigTableName: "datareal-crawler-dev-crawls-config"
   SearchConfigTableArn: "arn:aws:dynamodb:${env:AWS_REGION}:${env:AWS_ACCOUNTID}:table/${self:custom.SearchConfigTableName}"
+  DaemonArn: "arn:aws:lambda:${env:AWS_REGION}:${env:AWS_ACCOUNTID}:function:datareal-new-crawler-dev-Daemon"
   ErrorProcessorFunctionArn: "arn:aws:lambda:${env:AWS_REGION}:${env:AWS_ACCOUNTID}:function:datareal-new-crawler-dev-ErrorProcessor"
   SearchFunctionArn: "arn:aws:lambda:${env:AWS_REGION}:${env:AWS_ACCOUNTID}:function:datareal-new-crawler-dev-Search"
+  VerifierFunctionArn: "arn:aws:lambda:${env:AWS_REGION}:${env:AWS_ACCOUNTID}:function:datareal-new-crawler-dev-Verifier"
