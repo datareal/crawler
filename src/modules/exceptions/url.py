@@ -1,2 +1,3 @@
-class NoURLProvided(Exception):
-    pass
+class NoURLProvided(Exception): pass
+
+class NoValidURL(Exception): pass
