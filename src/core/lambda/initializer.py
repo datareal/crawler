@@ -20,7 +20,7 @@ def handler(event: dict, context) -> dict:
 
     for item in items:
         for url in item.get('urls'):
-            print(url)
+            aws.invoke('SEARCH_FUNCTION', {'url': url})
 
     return {
         "status_code": 200,
