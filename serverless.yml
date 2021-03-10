@@ -14,6 +14,7 @@ provider:
   stage: dev
   environment:
     REAL_ESTATE_TABLE: ${self:custom.RealEstatesTableName}
+    SEARCH_CONFIG_TABLE: ${self:custom.SearchConfigTableName}
     ERROR_PROCESSOR_FUNCTION: ${self:custom.ErrorProcessorFunctionArn}
     SEARCH_FUNCTION: ${self:custom.SearchFunctionArn}
   iam:
@@ -35,6 +36,7 @@ provider:
             - dynamodb:Query
           Resource:
               - ${self:custom.RealEstatesTableArn}/index/*
+              - ${self:custom.SearchConfigTableArn}/index/domain-index
 
 package:
   exclude:
@@ -62,5 +64,7 @@ custom:
     slim: true
   RealEstatesTableName: "datareal-crawler-real-estates"
   RealEstatesTableArn: "arn:aws:dynamodb:${env:AWS_REGION}:${env:AWS_ACCOUNTID}:table/${self:custom.RealEstatesTableName}"
+  SearchConfigTableName: "datareal-crawler-dev-crawls-config"
+  SearchConfigTableArn: "arn:aws:dynamodb:${env:AWS_REGION}:${env:AWS_ACCOUNTID}:table/${self:custom.SearchConfigTableName}"
   ErrorProcessorFunctionArn: "arn:aws:lambda:${env:AWS_REGION}:${env:AWS_ACCOUNTID}:function:datareal-new-crawler-dev-ErrorProcessor"
   SearchFunctionArn: "arn:aws:lambda:${env:AWS_REGION}:${env:AWS_ACCOUNTID}:function:datareal-new-crawler-dev-Search"
