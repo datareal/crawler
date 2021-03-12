@@ -41,7 +41,7 @@ def handler(event: dict, content) -> dict:
             }
             if rawdata_item := database.query(**rawdata_query):
                 object_path = storage.filename_from_url(url)
-                item_payload['s3_uri'] = f"s3://datareal-crawler-bodies/{object_path['path']/{object_path['filename']}}"
+                item_payload['s3_uri'] = f"s3://datareal-crawler-bodies/{object_path['path']}/{object_path['filename']}"
                 item_payload['action'] = 'REPROCESS'
 
         aws.invoke('ITEM_FUNCTION', item_payload)
