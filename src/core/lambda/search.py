@@ -21,7 +21,7 @@ def handler(event: dict, context) -> dict:
         'index': 'domain-index',
         'key': 'domain',
         'value': URL.extract_domain(url)
-    })[0]
+    })
 
     header = Header.Header()
     response = request.Request(
@@ -42,7 +42,7 @@ def handler(event: dict, context) -> dict:
     })
 
     aws.invoke('VERIFIER_FUNCTION', {'urls': items})
-    aws.invoke('DAEMON', {'target': 'DAEMON', 'payload': {'url': next_page}})
+    aws.invoke('DAEMON', {'target': 'SEARCH_FUNCTION', 'payload': {'url': next_page}})
 
     return {
         "status_code": 200,
