@@ -15,10 +15,14 @@ provider:
   environment:
     REAL_ESTATE_TABLE: ${self:custom.RealEstatesTableName}
     SEARCH_CONFIG_TABLE: ${self:custom.SearchConfigTableName}
+    ITEM_CONFIG_TABLE: ${self:custom.ItemConfigTableName}
+    RAWDATA_TABLE: ${self:custom.RawdataTableName}
+    UNIQUE_RAWDATA_TABLE: ${self:custom.UniqueRawdataTableName}
     DAEMON: ${self:custom.DaemonArn}
     ERROR_PROCESSOR_FUNCTION: ${self:custom.ErrorProcessorFunctionArn}
     SEARCH_FUNCTION: ${self:custom.SearchFunctionArn}
     VERIFIER_FUNCTION: ${self:custom.VerifierFunctionArn}
+    ITEM_FUNCTION: ${self:custom.ItemFunctionArn}
   iam:
     role:
       statements:
@@ -30,6 +34,12 @@ provider:
             - ${self:custom.ErrorProcessorFunctionArn}
             - ${self:custom.SearchFunctionArn}
             - ${self:custom.VerifierFunctionArn}
+            - ${self:custom.ItemFunctionArn}
+        - Effect: Allow
+          Action: s3:*
+          Resource:
+            - "arn:aws:s3:::datareal-crawler-bodies"
+            - "arn:aws:s3:::datareal-crawler-bodies/*"
         - Effect: Allow
           Action:
             - dynamodb:Scan
@@ -41,6 +51,16 @@ provider:
           Resource:
               - ${self:custom.RealEstatesTableArn}/index/*
               - ${self:custom.SearchConfigTableArn}/index/domain-index
+              - ${self:custom.ItemConfigTableArn}/index/domain-index
+              - ${self:custom.RawdataTableArn}/index/url-date-index
+              - ${self:custom.UniqueRawdataTableArn}/index/url-index
+        - Effect: Allow
+          Action:
+            - dynamodb:PutItem
+            - dynamodb:UpdateItem
+          Resource:
+              - ${self:custom.RawdataTableArn}
+              - ${self:custom.UniqueRawdataTableArn}
 
 package:
   exclude:
@@ -62,6 +82,8 @@ functions:
     handler: src/core/lambda/search.handler
   Verifier:
     handler: src/core/lambda/verifier.handler
+  Item:
+    handler: src/core/lambda/item.handler
 
 custom:
   prune:
@@ -72,9 +94,16 @@ custom:
     slim: true
   RealEstatesTableName: "datareal-crawler-real-estates"
   RealEstatesTableArn: "arn:aws:dynamodb:${env:AWS_REGION}:${env:AWS_ACCOUNTID}:table/${self:custom.RealEstatesTableName}"
+  RawdataTableName: "datareal-crawler-rawdata"
+  RawdataTableArn: "arn:aws:dynamodb:${env:AWS_REGION}:${env:AWS_ACCOUNTID}:table/${self:custom.RawdataTableName}"
+  UniqueRawdataTableName: "datareal-crawler-unique-rawdata"
+  UniqueRawdataTableArn: "arn:aws:dynamodb:${env:AWS_REGION}:${env:AWS_ACCOUNTID}:table/${self:custom.UniqueRawdataTableName}"
   SearchConfigTableName: "datareal-crawler-dev-crawls-config"
   SearchConfigTableArn: "arn:aws:dynamodb:${env:AWS_REGION}:${env:AWS_ACCOUNTID}:table/${self:custom.SearchConfigTableName}"
+  ItemConfigTableName: "datareal-crawler-dev-scrape-config"
+  ItemConfigTableArn: "arn:aws:dynamodb:${env:AWS_REGION}:${env:AWS_ACCOUNTID}:table/${self:custom.ItemConfigTableName}"
   DaemonArn: "arn:aws:lambda:${env:AWS_REGION}:${env:AWS_ACCOUNTID}:function:datareal-new-crawler-dev-Daemon"
   ErrorProcessorFunctionArn: "arn:aws:lambda:${env:AWS_REGION}:${env:AWS_ACCOUNTID}:function:datareal-new-crawler-dev-ErrorProcessor"
   SearchFunctionArn: "arn:aws:lambda:${env:AWS_REGION}:${env:AWS_ACCOUNTID}:function:datareal-new-crawler-dev-Search"
   VerifierFunctionArn: "arn:aws:lambda:${env:AWS_REGION}:${env:AWS_ACCOUNTID}:function:datareal-new-crawler-dev-Verifier"
+  ItemFunctionArn: "arn:aws:lambda:${env:AWS_REGION}:${env:AWS_ACCOUNTID}:function:datareal-new-crawler-dev-Item"
