@@ -10,10 +10,10 @@ import src.modules.database as database
 
 def handler(event: dict, content) -> dict:
     items = list()
-    item_payload = dict()
     urls: list = event.get('urls')
 
     for url in urls:
+        item_payload = dict()
         item_payload['url'] = url
         item_payload['action'] = 'ADD'
 
@@ -34,7 +34,9 @@ def handler(event: dict, content) -> dict:
                 'sort_key': 'date',
                 'sort_value': datetime.datetime.today().strftime("%Y-%m-%d")
             }):
+                item_payload['process'] = rawdata_item['process']
                 item_payload['s3_uri'] = rawdata_item['s3_uri']
+                item_payload['status_code'] = int(rawdata_item['status_code'])
                 item_payload['action'] = 'REPROCESS'
 
         aws.invoke('ITEM_FUNCTION', item_payload)
