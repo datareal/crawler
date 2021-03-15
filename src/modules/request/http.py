@@ -101,7 +101,4 @@ class Request:
                 errors.forbbiden(self._url)
                 raise exceptions.RequestForbbiden(f"The requested url {self._url} returned a 403 status code.")
 
-            else:
-                raise Exception(f"Got the following status code from the requested server: {response.status_code}")
-
             return response
