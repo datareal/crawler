@@ -79,7 +79,17 @@ def query(table: str, query: dict) -> dict:
     }
 
     if query.get('sort_key'):
-        query_kwargs['KeyConditionExpression'] = conditions.Key(query.get('hash_key')).eq(query.get('hash_value')) & conditions.Key(query.get('range_key')).eq(query.get('range_value'))
+        query_kwargs.update({
+            "ExpressionAttributeValues": {
+                ":pk": query.get('hash_value'),
+                ":sk": query.get('sort_value')
+            },
+            "ExpressionAttributeNames": {
+                "#pk": query.get('hash_key'),
+                "#sk": query.get('sort_key')
+            },
+            "KeyConditionExpression": "#pk = :pk and #sk = :sk"
+        })
 
     else:
         query_kwargs['KeyConditionExpression'] = conditions.Key(query.get('key')).eq(query.get('value'))
@@ -94,7 +104,7 @@ def query(table: str, query: dict) -> dict:
             done = start_key is None
 
     except exceptions.ClientError as error:
-        raise DynamoDB.ClientError(f'Error when quering Dynamo {table} with query {query}\n\n{error}')
+        raise DynamoDB.ClientError(f'Error when quering Dynamo {os.environ.get(table)} with query {query_kwargs}\n\n{error}')
 
     else:
         if result:
