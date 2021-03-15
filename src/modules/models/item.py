@@ -1,0 +1,32 @@
+import datetime
+
+from .field import Field
+
+class Item(object):
+    s3_uri = Field()
+    url = Field()
+    date = datetime.datetime.today().strftime("%Y-%m-%d")
+    domain = Field()
+    status = Field()
+    item_id = Field()
+    process_id = Field() 
+    status_code = Field()
+    title = Field()
+    category = Field()
+    body = Field()
+    price = Field()
+    rooms = Field()
+    bathrooms = Field()
+    suites = Field()
+    garages = Field()
+    features = Field()
+    images = Field()
+    city = Field()
+    address = Field()
+    zipcode = Field()
+    latitude = Field()
+    longitude = Field()
+    neighbourhood = Field()
+    ground_area = Field()
+    total_area = Field()
+    privative_area = Field()
